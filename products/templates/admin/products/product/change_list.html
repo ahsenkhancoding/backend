@@ -1,0 +1,30 @@
+{# backend/products/templates/admin/products/product/change_list.html #}
+{% extends "admin/change_list.html" %}
+{% load i18n static admin_urls %} {# Ensure necessary tags are loaded #}
+
+{# Add custom buttons to the object tools section #}
+{% block object-tools-items %}
+  {# Button for general import/update #}
+  <li>
+    {# Use admin_urlname filter to get the correct URL name #}
+    {% url cl.opts|admin_urlname:'import_csv' as import_url %}
+    <a href="{% add_preserved_filters import_url %}" class="addlink">
+      {% blocktranslate %}Import/Update All from CSV{% endblocktranslate %}
+    </a>
+  </li>
+
+  {# ADD THE NEW BUTTON for Price Updates #}
+  <li>
+    {# Use admin_urlname filter for the new price update URL name #}
+    {% url cl.opts|admin_urlname:'update_prices_csv' as price_import_url %}
+    {# Apply default button styling explicitly if needed, or add custom class #}
+    <a href="{% add_preserved_filters price_import_url %}" class="addlink">
+      {% blocktranslate %}Update Prices from CSV{% endblocktranslate %}
+    </a>
+  </li>
+  {# END of new button #}
+
+  {# Keep the original Add button provided by the parent template #}
+  {{ block.super }}
+
+{% endblock %}

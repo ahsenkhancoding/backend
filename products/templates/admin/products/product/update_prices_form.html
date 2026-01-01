@@ -1,0 +1,51 @@
+{# backend/products/templates/admin/products/product/update_prices_form.html #}
+{% extends "admin/base_site.html" %}
+{% load i18n admin_urls static %} {# Load necessary tags #}
+
+{% block extrastyle %}{{ block.super }}<link rel="stylesheet" href="{% static "admin/css/forms.css" %}">{% endblock %}
+
+{% block coltype %}colM{% endblock %}
+
+{% block bodyclass %}{{ block.super }} app-{{ opts.app_label }} model-{{ opts.model_name }} change-form import-form price-update-form{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+    <a href="{% url 'admin:index' %}">{% translate 'Home' %}</a> ›
+    <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a> ›
+    {# Link back to the product change list #}
+    <a href="{% url opts|admin_urlname:'changelist' %}">{{ opts.verbose_name_plural|capfirst }}</a> ›
+    {% translate 'Update Prices from CSV' %} {# Specific title #}
+</div>
+{% endblock %}
+
+{% block content %}
+<div id="content-main">
+    {# The form tag will be added properly when we implement the view logic #}
+    <form method="post" enctype="multipart/form-data"> {% csrf_token %}
+        <fieldset class="module aligned">
+            <h2>{{ title }}</h2> {# Title comes from view context #}
+
+            {# Render the form field (will be added via context later) #}
+            {% if form %} {# Check if form exists in context #}
+            <div class="form-row field-csv_file">
+                {{ form.csv_file.errors }}
+                {{ form.csv_file.label_tag }}
+                {{ form.csv_file }}
+                <p class="help">
+                    {% blocktranslate trimmed %}
+                    Upload a CSV file to update prices. Required headers: <strong>sku, purchase_price, selling_price</strong>.
+                    Only purchase and selling prices for existing products matching the SKUs will be updated. Other columns will be ignored.
+                    {% endblocktranslate %}
+                </p>
+            </div>
+            {% else %}
+              <p>{% translate "Form not available." %}</p> {# Fallback #}
+            {% endif %}
+        </fieldset>
+
+        <div class="submit-row">
+            <input type="submit" value="{% translate 'Update Prices from CSV' %}" class="default">
+        </div>
+    </form>
+</div>
+{% endblock %}
