@@ -7,16 +7,25 @@ import os
 from pathlib import Path
 from datetime import timedelta
 
+# Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Quick-start development settings - unsuitable for production
+# See https://docs.djangoproject.com/en/stable/howto/deployment/checklist/
+
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-%ne1qe4%p(z9g3d%f3rrox!-%wpo7&3_orzmqg55sxl3l!9ja3')
+
 DEBUG = os.environ.get('DJANGO_DEBUG', 'True') == 'True'
-ALLOWED_HOSTS = ALLOWED_HOSTS = [
+
+ALLOWED_HOSTS = [
     'ahsenkhan.pythonanywhere.com',
     'localhost',
     '127.0.0.1',
-    ]
+]
 
 AUTH_USER_MODEL = 'users.CustomUser'
+
+# Application definition
 
 INSTALLED_APPS = [
     # Custom Apps
@@ -41,11 +50,10 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'django_filters',
     'drf_spectacular',
-
 ]
 
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',  # Must be at the top
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -75,6 +83,9 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'pharmacy_core.wsgi.application'
 
+# Database
+# https://docs.djangoproject.com/en/stable/ref/settings/#databases
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -82,6 +93,36 @@ DATABASES = {
     }
 }
 
+# Password validation
+# https://docs.djangoproject.com/en/stable/ref/settings/#auth-password-validators
+
+AUTH_PASSWORD_VALIDATORS = [
+    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',},
+    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',},
+    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',},
+    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',},
+]
+
+# Internationalization
+# https://docs.djangoproject.com/en/stable/topics/i18n/
+
+LANGUAGE_CODE = 'en-us'
+TIME_ZONE = 'UTC'
+USE_I18N = True
+USE_TZ = True
+
+# Static files (CSS, JavaScript, Images)
+# https://docs.djangoproject.com/en/stable/howto/static-files/
+
+STATIC_URL = 'static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'mediafiles'
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Cache configuration
 CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
@@ -89,24 +130,7 @@ CACHES = {
     }
 }
 
-AUTH_PASSWORD_VALIDATORS = [
-    { 'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator', },
-    { 'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator', },
-    { 'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator', },
-    { 'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator', },
-]
-
-LANGUAGE_CODE = 'en-us'
-TIME_ZONE = 'UTC'
-USE_I18N = True
-USE_TZ = True
-
-STATIC_URL = 'static/'
-MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'mediafiles'
-
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
+# REST Framework Configuration
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
@@ -119,6 +143,7 @@ REST_FRAMEWORK = {
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 
+# Simple JWT Configuration
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
@@ -145,21 +170,27 @@ SIMPLE_JWT = {
     "SLIDING_TOKEN_REFRESH_LIFETIME": timedelta(days=1),
 }
 
+# CORS Configuration
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
     "https://frontend-git-main-ahsenkhans-projects.vercel.app",
     "https://frontend-9vaax0ydy-ahsenkhans-projects.vercel.app",
 ]
+
 CORS_ALLOW_CREDENTIALS = True
 
+# CSRF Configuration
+CSRF_TRUSTED_ORIGINS = [
+    "https://frontend-git-main-ahsenkhans-projects.vercel.app",
+    "https://frontend-9vaax0ydy-ahsenkhans-projects.vercel.app",
+    "https://ahsenkhan.pythonanywhere.com",
+]
+
+# API Documentation Configuration
 SPECTACULAR_SETTINGS = {
     'TITLE': 'Online Pharmacy API',
     'DESCRIPTION': 'API documentation for the Online Pharmacy backend project.',
     'VERSION': '1.0.0',
     'SERVE_INCLUDE_SCHEMA': False,
 }
-CSRF_TRUSTED_ORIGINS = [
-    "https://frontend-git-main-ahsenkhans-projects.vercel.app",
-    "https://frontend-9vaax0ydy-ahsenkhans-projects.vercel.app",
-]
