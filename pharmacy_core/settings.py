@@ -10,7 +10,11 @@ from datetime import timedelta
 BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-%ne1qe4%p(z9g3d%f3rrox!-%wpo7&3_orzmqg55sxl3l!9ja3')
 DEBUG = os.environ.get('DJANGO_DEBUG', 'True') == 'True'
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ALLOWED_HOSTS = [
+    'ahsenkhan.pythonanywhere.com',
+    'localhost',
+    '127.0.0.1',
+    ]
 
 AUTH_USER_MODEL = 'users.CustomUser'
 
@@ -144,6 +148,8 @@ SIMPLE_JWT = {
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
+    "https://frontend-git-main-ahsenkhans-projects.vercel.app",
+    "https://frontend-9vaax0ydy-ahsenkhans-projects.vercel.app",
 ]
 CORS_ALLOW_CREDENTIALS = True
 
@@ -153,3 +159,7 @@ SPECTACULAR_SETTINGS = {
     'VERSION': '1.0.0',
     'SERVE_INCLUDE_SCHEMA': False,
 }
+CSRF_TRUSTED_ORIGINS = [
+    "https://frontend-git-main-ahsenkhans-projects.vercel.app",
+    "https://frontend-9vaax0ydy-ahsenkhans-projects.vercel.app",
+]
