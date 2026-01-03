@@ -215,7 +215,7 @@ class ProductAdmin(admin.ModelAdmin):
 
         context = {
             **self.admin_site.each_context(request),
-            'title': _('Import/Update Products from CSV'),
+            'title': 'Import/Update Products from CSV',
             'opts': opts,
             'form': form,
             'has_view_permission': self.has_view_permission(request),
@@ -344,7 +344,7 @@ class ProductAdmin(admin.ModelAdmin):
         # --- Prepare Context for Rendering the Template (GET request or invalid POST) ---
         context = {
             **self.admin_site.each_context(request),
-            'title': _('Update Product Prices from CSV'), # Specific title
+            'title': 'Update Product Prices from CSV', # Specific title
             'opts': opts,
             'form': form, # Pass the bound (if POST and invalid) or unbound (if GET) form
             'has_view_permission': self.has_view_permission(request), # Needed for base template
