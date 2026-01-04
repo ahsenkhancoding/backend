@@ -8,7 +8,6 @@ from django.utils.translation import gettext_lazy as _
 # =======================================
 class Category(models.Model):
     name = models.CharField(max_length=255, unique=True)
-    # Slug is auto-generated if left blank
     slug = models.SlugField(max_length=255, unique=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -31,7 +30,6 @@ class Category(models.Model):
 # =======================================
 class Brand(models.Model):
     name = models.CharField(max_length=255, unique=True)
-    # Slug is auto-generated if left blank
     slug = models.SlugField(max_length=255, unique=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -50,63 +48,59 @@ class Brand(models.Model):
         ordering = ['name']
 
 # =======================================
-# Product Model
+# Product Model (1mg Style Upgrade)
 # =======================================
 class Product(models.Model):
     # --- Basic Info ---
     name = models.CharField(max_length=255)
-    # Slug is auto-generated if left blank
-    slug = models.SlugField(max_length=255, unique=True, blank=True, help_text=_("Unique URL-friendly identifier. Auto-generated if left blank."))
-    # SKU should be required and unique
+    slug = models.SlugField(max_length=255, unique=True, blank=True, help_text=_("Unique URL-friendly identifier."))
     sku = models.CharField(max_length=100, unique=True, help_text=_("Unique Stock Keeping Unit"))
-    # Brand and Category are optional foreign keys
     brand = models.ForeignKey(Brand, on_delete=models.SET_NULL, null=True, blank=True, related_name='products')
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True, related_name='products')
 
-    # --- Detailed Info (Optional Text Fields) ---
-    # blank=True allows empty values in forms/admin
-    description = models.TextField(blank=True)
-    composition = models.TextField(blank=True, help_text=_("Ingredients or chemical composition."))
-    usage_instructions = models.TextField(blank=True)
+    # --- 1mg-Style Content Sections ---
+    description = models.TextField(blank=True, help_text=_("General introduction or overview."))
+    composition = models.TextField(blank=True, help_text=_("Salt Composition (e.g. Cefpodoxime Proxetil (200mg))"))
+    benefits = models.TextField(blank=True, help_text=_("Uses and benefits of the medicine."))
+    side_effects = models.TextField(blank=True, help_text=_("Common and serious side effects."))
+    how_to_use = models.TextField(blank=True, help_text=_("Dosage instructions (How to take it)."))
+    how_it_works = models.TextField(blank=True, help_text=_("Mechanism of action."))
+    quick_tips = models.TextField(blank=True, help_text=_("Expert advice and tips for the patient."))
+    
+    # --- Safety Advice (1mg Grid) ---
+    safety_alcohol = models.TextField(blank=True, default="Consult your doctor before consuming alcohol.")
+    safety_pregnancy = models.TextField(blank=True, default="Consult your doctor before use during pregnancy.")
+    safety_breastfeeding = models.TextField(blank=True, default="Consult your doctor before use during breastfeeding.")
+    safety_driving = models.TextField(blank=True, default="Do not drive if you feel dizzy or sleepy.")
+    safety_kidney = models.TextField(blank=True, default="Caution is advised in patients with kidney disease.")
+    safety_liver = models.TextField(blank=True, default="Caution is advised in patients with liver disease.")
+
+    # --- Fact Box (1mg Sidebar) ---
+    fact_box_habit_forming = models.CharField(max_length=50, default="No")
+    fact_box_therapeutic_class = models.CharField(max_length=255, blank=True)
+    fact_box_chemical_class = models.CharField(max_length=255, blank=True)
+    fact_box_action_class = models.CharField(max_length=255, blank=True)
+
+    # --- Pricing & Logistics ---
+    mrp = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    purchase_price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    selling_price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    image_url = models.URLField(max_length=1024, blank=True, null=True)
+    requires_prescription = models.BooleanField(default=False)
+    is_available = models.BooleanField(default=True)
+
+    # --- Legacy Compatibility (Kept to prevent migration errors) ---
+    usage_instructions = models.TextField(blank=True) 
     warnings = models.TextField(blank=True)
 
-    # --- Pricing ---
-    # Ensure these are DecimalFields
-    mrp = models.DecimalField(max_digits=10, decimal_places=2, default=0.00, help_text=_("Maximum Retail Price"))
-    # The newly added field - make it optional for now
-    purchase_price = models.DecimalField(
-        max_digits=10,
-        decimal_places=2,
-        null=True, # Allows NULL in the database
-        blank=True, # Allows empty in forms/admin
-        help_text=_("Price at which the product was procured.")
-    )
-    selling_price = models.DecimalField(max_digits=10, decimal_places=2, help_text=_("Price at which the product is sold."))
-
-    # --- Image (Optional URL) ---
-    # blank=True and null=True make this optional
-    image_url = models.URLField(max_length=1024, blank=True, null=True)
-
-    # --- Status & Requirements ---
-    # Booleans generally don't need null=True unless you need a "null" state
-    requires_prescription = models.BooleanField(default=False)
-    is_available = models.BooleanField(default=True, help_text=_("Is the product available for sale?"))
-
-    # --- Timestamps (Managed by Django) ---
+    # --- Timestamps ---
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-    # --- !!! ADD BACK ANY OTHER CUSTOM FIELDS YOU NEEDED HERE !!! ---
-    # If you had fields like formulation, health_concerns, etc., add their definitions back here.
-    # Example:
-    # formulation = models.CharField(max_length=100, blank=True)
-    # ------------------------------------------------------------
-
     def save(self, *args, **kwargs):
-        if not self.slug and self.name: # Generate slug only if blank and name exists
+        if not self.slug and self.name:
             base_slug = slugify(self.name)
             unique_slug = base_slug
-            # Basic uniqueness check (a better check might involve querying)
             num = 1
             while Product.objects.filter(slug=unique_slug).exclude(pk=self.pk).exists():
                 unique_slug = f'{base_slug}-{num}'
@@ -121,11 +115,8 @@ class Product(models.Model):
         verbose_name = _("Product")
         verbose_name_plural = _("Products")
         ordering = ['name', 'sku']
-        # Define indexes for commonly filtered/ordered fields
         indexes = [
             models.Index(fields=['sku']),
             models.Index(fields=['name']),
-            models.Index(fields=['category']),
-            models.Index(fields=['brand']),
-            models.Index(fields=['is_available']), # If frequently filtered
         ]
+        
