@@ -1,4 +1,3 @@
-# backend/products/models.py
 from django.db import models
 from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
@@ -48,7 +47,7 @@ class Brand(models.Model):
         ordering = ['name']
 
 # =======================================
-# Product Model (1mg Style Upgrade)
+# Product Model (Full 1mg & SEO Upgrade)
 # =======================================
 class Product(models.Model):
     # --- Basic Info ---
@@ -59,27 +58,38 @@ class Product(models.Model):
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True, related_name='products')
 
     # --- 1mg-Style Content Sections ---
-    description = models.TextField(blank=True, help_text=_("General introduction or overview."))
+    description = models.TextField(blank=True, help_text=_("General patient-friendly introduction."))
     composition = models.TextField(blank=True, help_text=_("Salt Composition (e.g. Cefpodoxime Proxetil (200mg))"))
-    benefits = models.TextField(blank=True, help_text=_("Uses and benefits of the medicine."))
-    side_effects = models.TextField(blank=True, help_text=_("Common and serious side effects."))
-    how_to_use = models.TextField(blank=True, help_text=_("Dosage instructions (How to take it)."))
+    benefits = models.TextField(blank=True, help_text=_("Uses and clinical benefits."))
+    side_effects = models.TextField(blank=True, help_text=_("Comprehensive list of common and rare side effects."))
+    how_to_use = models.TextField(blank=True, help_text=_("General instructions on consumption."))
     how_it_works = models.TextField(blank=True, help_text=_("Mechanism of action."))
+    
+    # --- Advanced Clinical Details (New) ---
+    dosage = models.TextField(blank=True, help_text=_("Dosage guidelines by age and weight."))
+    interactions = models.TextField(blank=True, help_text=_("Drug-drug and drug-food interactions."))
+    missed_dose = models.TextField(blank=True, help_text=_("Instructions for a forgotten dose."))
+    storage_conditions = models.TextField(blank=True, help_text=_("Storage temperature and environment advice."))
     quick_tips = models.TextField(blank=True, help_text=_("Expert advice and tips for the patient."))
     
-    # --- Safety Advice (1mg Grid) ---
-    safety_alcohol = models.TextField(blank=True, default="Consult your doctor before consuming alcohol.")
-    safety_pregnancy = models.TextField(blank=True, default="Consult your doctor before use during pregnancy.")
-    safety_breastfeeding = models.TextField(blank=True, default="Consult your doctor before use during breastfeeding.")
-    safety_driving = models.TextField(blank=True, default="Do not drive if you feel dizzy or sleepy.")
-    safety_kidney = models.TextField(blank=True, default="Caution is advised in patients with kidney disease.")
-    safety_liver = models.TextField(blank=True, default="Caution is advised in patients with liver disease.")
+    # --- Safety Advice Grid ---
+    safety_alcohol = models.TextField(blank=True)
+    safety_pregnancy = models.TextField(blank=True)
+    safety_breastfeeding = models.TextField(blank=True)
+    safety_driving = models.TextField(blank=True)
+    safety_kidney = models.TextField(blank=True)
+    safety_liver = models.TextField(blank=True)
 
-    # --- Fact Box (1mg Sidebar) ---
+    # --- Fact Box (Sidebar Data) ---
     fact_box_habit_forming = models.CharField(max_length=50, default="No")
     fact_box_therapeutic_class = models.CharField(max_length=255, blank=True)
     fact_box_chemical_class = models.CharField(max_length=255, blank=True)
     fact_box_action_class = models.CharField(max_length=255, blank=True)
+
+    # --- SEO Fields (New) ---
+    meta_title = models.CharField(max_length=255, blank=True, help_text=_("Search engine title (max 60 chars)."))
+    meta_description = models.TextField(blank=True, help_text=_("Search engine description (max 155 chars)."))
+    meta_keywords = models.TextField(blank=True, help_text=_("SEO keywords separated by commas."))
 
     # --- Pricing & Logistics ---
     mrp = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
@@ -89,7 +99,7 @@ class Product(models.Model):
     requires_prescription = models.BooleanField(default=False)
     is_available = models.BooleanField(default=True)
 
-    # --- Legacy Compatibility (Kept to prevent migration errors) ---
+    # --- Legacy Fields (Kept for compatibility) ---
     usage_instructions = models.TextField(blank=True) 
     warnings = models.TextField(blank=True)
 
@@ -99,13 +109,7 @@ class Product(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.slug and self.name:
-            base_slug = slugify(self.name)
-            unique_slug = base_slug
-            num = 1
-            while Product.objects.filter(slug=unique_slug).exclude(pk=self.pk).exists():
-                unique_slug = f'{base_slug}-{num}'
-                num += 1
-            self.slug = unique_slug
+            self.slug = slugify(self.name)
         super().save(*args, **kwargs)
 
     def __str__(self):
